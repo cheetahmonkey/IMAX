@@ -82,4 +82,4 @@ The public page is generated at `docs/index.html` on every successful run. Confi
 GitHub Pages to deploy from the repository's default branch and the `/docs` folder.
 For this repository, the expected URL is:
 
-https://lepenseur1.github.io/IMAX/
+https://cheetahmonkey.github.io/IMAX/
