@@ -1,6 +1,13 @@
 import unittest
 
-from check_odyssey import PageSignals, Result, classify_signals, parse_showtime, render_shareable_html
+from check_odyssey import (
+    PageSignals,
+    Result,
+    classify_signals,
+    format_refresh_subtitle,
+    parse_showtime,
+    render_shareable_html,
+)
 
 
 def signals(**overrides):
@@ -84,6 +91,7 @@ class HtmlRenderingTests(unittest.TestCase):
         self.assertIn(">12:40 PM</a>", rendered)
         self.assertIn("only 2", rendered)
         self.assertIn("1</strong> showings", rendered)
+        self.assertIn("Refreshed " + format_refresh_subtitle(result.checked_at), rendered)
 
 
 if __name__ == "__main__":

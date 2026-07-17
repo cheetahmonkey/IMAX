@@ -339,6 +339,19 @@ def markdown_escape(value) -> str:
     return str(value if value is not None else "").replace("|", "\\|").replace("\n", " ")
 
 
+def format_refresh_subtitle(checked_at: str) -> str:
+    """Render the most recent check time in the host's local timezone."""
+    if not checked_at:
+        return "not yet refreshed"
+    try:
+        timestamp = datetime.fromisoformat(checked_at)
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
+        return timestamp.astimezone().strftime("%m-%d @ %I:%M %p").lower()
+    except ValueError:
+        return "refresh time unavailable"
+
+
 def write_markdown(path: Path, title: str, results: Sequence[Result]) -> None:
     headers = ["Date", "Time", "Status", "Max quantity", "Performance ID", "URL", "Evidence"]
     lines = ["# {}".format(title), "", "| " + " | ".join(headers) + " |"]
@@ -375,6 +388,7 @@ def render_shareable_html(results: Sequence[Result]) -> str:
         grouped[-1][1].append(result)
 
     checked_at = max((result.checked_at for result in results), default="")
+    refresh_subtitle = format_refresh_subtitle(checked_at)
     rows = []
     for date_value, showings in grouped:
         parsed_date = datetime.strptime(date_value, "%Y-%m-%d")
@@ -422,6 +436,7 @@ def render_shareable_html(results: Sequence[Result]) -> str:
     main {{ width:min(920px,calc(100% - 32px)); margin:0 auto; padding:64px 0 72px; }}
     .eyebrow {{ margin:0 0 8px; color:var(--red); font-size:.76rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; }}
     h1 {{ margin:0; font-size:clamp(2.4rem,8vw,5.6rem); line-height:.93; letter-spacing:-.055em; }}
+    .refreshed {{ margin:12px 0 0; color:var(--gold); font-size:.93rem; font-weight:750; letter-spacing:.04em; text-transform:uppercase; }}
     .lede {{ max-width:650px; margin:22px 0 10px; color:var(--muted); font-size:1.08rem; }}
     .summary {{ display:inline-flex; gap:8px; align-items:center; margin:10px 0 30px; padding:8px 12px; border:1px solid var(--line); border-radius:999px; background:var(--panel); font-size:.9rem; }}
     .dot {{ width:8px; height:8px; border-radius:50%; background:#43d17d; box-shadow:0 0 12px #43d17d; }}
@@ -455,6 +470,7 @@ def render_shareable_html(results: Sequence[Result]) -> str:
     <header>
       <p class="eyebrow">Pacific Science Center · IMAX</p>
       <h1>The Odyssey</h1>
+      <p class="refreshed">Refreshed {refresh_subtitle}</p>
       <p class="lede">Available showtimes in Seattle. Select a time to open that performance’s official ticket page.</p>
       <p class="summary"><span class="dot" aria-hidden="true"></span><strong>{show_count}</strong> showings available across <strong>{date_count}</strong> days</p>
     </header>
@@ -488,6 +504,7 @@ def render_shareable_html(results: Sequence[Result]) -> str:
         empty_row=empty_row,
         checked_at=html.escape(checked_at, quote=True),
         checked_at_fallback=html.escape(checked_at or "not yet checked"),
+        refresh_subtitle=html.escape(refresh_subtitle),
     )
 
 
