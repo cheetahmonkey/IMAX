@@ -1,22 +1,21 @@
 event_name,performance_id,date,time,status,max_selectable_quantity,performance_url,checked_at,evidence
-The Odyssey,79140,2026-07-31,12:40 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140,2026-07-31T09:35:09+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79184,2026-07-31,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79184,2026-07-31T09:35:13+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79199,2026-07-31,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79199,2026-07-31T09:35:17+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79174,2026-08-01,12:40 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79174,2026-07-31T09:35:21+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79185,2026-08-01,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79185,2026-07-31T09:35:25+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79200,2026-08-01,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79200,2026-07-31T09:35:29+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79175,2026-08-02,12:40 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79175,2026-07-31T09:35:32+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79186,2026-08-02,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79186,2026-07-31T09:35:36+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79201,2026-08-02,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79201,2026-07-31T09:35:40+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,80599,2026-08-03,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80599,2026-07-31T09:35:43+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 196; Add To Cart button disabled pending a selection
-The Odyssey,79187,2026-08-03,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79187,2026-07-31T09:35:47+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79202,2026-08-03,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79202,2026-07-31T09:35:51+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,80600,2026-08-04,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80600,2026-07-31T09:35:55+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 240; Add To Cart button disabled pending a selection
-The Odyssey,79188,2026-08-04,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79188,2026-07-31T09:35:58+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79203,2026-08-04,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79203,2026-07-31T09:36:02+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,80601,2026-08-05,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80601,2026-07-31T09:36:06+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 244; Add To Cart button disabled pending a selection
-The Odyssey,79189,2026-08-05,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79189,2026-07-31T09:36:10+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79204,2026-08-05,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79204,2026-07-31T09:36:13+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,80602,2026-08-06,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80602,2026-07-31T09:36:17+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 224; Add To Cart button disabled pending a selection
-The Odyssey,79190,2026-08-06,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79190,2026-07-31T09:36:21+00:00,main document HTTP 200; explicit 'Sold Out!' text
-The Odyssey,79205,2026-08-06,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79205,2026-07-31T09:36:24+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79140,2026-07-31,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140,2026-07-31T20:55:18+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79199,2026-07-31,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79199,2026-07-31T20:55:23+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79174,2026-08-01,12:40 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79174,2026-07-31T20:55:27+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79185,2026-08-01,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79185,2026-07-31T20:55:32+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79200,2026-08-01,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79200,2026-07-31T20:55:41+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79175,2026-08-02,12:40 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79175,2026-07-31T20:55:48+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79186,2026-08-02,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79186,2026-07-31T20:55:53+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79201,2026-08-02,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79201,2026-07-31T20:55:58+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,80599,2026-08-03,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80599,2026-07-31T20:56:03+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 164; Add To Cart button disabled pending a selection
+The Odyssey,79187,2026-08-03,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79187,2026-07-31T20:56:08+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79202,2026-08-03,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79202,2026-07-31T20:56:12+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,80600,2026-08-04,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80600,2026-07-31T20:56:16+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 230; Add To Cart button disabled pending a selection
+The Odyssey,79188,2026-08-04,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79188,2026-07-31T20:56:20+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79203,2026-08-04,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79203,2026-07-31T20:56:25+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,80601,2026-08-05,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80601,2026-07-31T20:56:29+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 233; Add To Cart button disabled pending a selection
+The Odyssey,79189,2026-08-05,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79189,2026-07-31T20:56:33+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79204,2026-08-05,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79204,2026-07-31T20:56:38+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,80602,2026-08-06,12:40 PM,AVAILABLE,50,https://my.pacificsciencecenter.org/79140/80602,2026-07-31T20:56:42+00:00,main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 212; Add To Cart button disabled pending a selection
+The Odyssey,79190,2026-08-06,4:05 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79190,2026-07-31T20:56:47+00:00,main document HTTP 200; explicit 'Sold Out!' text
+The Odyssey,79205,2026-08-06,7:30 PM,SOLD_OUT,,https://my.pacificsciencecenter.org/79140/79205,2026-07-31T20:56:51+00:00,main document HTTP 200; explicit 'Sold Out!' text
