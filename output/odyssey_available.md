@@ -2,9 +2,7 @@
 
 | Date | Time | Status | Max quantity | Performance ID | URL | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-08-24 | 4:00 PM | AVAILABLE | 50 | 79140 | [tickets](https://my.pacificsciencecenter.org/79140) | main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 217; Add To Cart button disabled pending a selection |
-| 2026-08-24 | 7:30 PM | AVAILABLE | 50 | 80865 | [tickets](https://my.pacificsciencecenter.org/79140/80865) | main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 208; Add To Cart button disabled pending a selection |
-| 2026-08-25 | 4:00 PM | AVAILABLE | 50 | 80861 | [tickets](https://my.pacificsciencecenter.org/79140/80861) | main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 254; Add To Cart button disabled pending a selection |
-| 2026-08-25 | 7:30 PM | AVAILABLE | 50 | 80866 | [tickets](https://my.pacificsciencecenter.org/79140/80866) | main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 244; Add To Cart button disabled pending a selection |
+| 2026-08-25 | 4:00 PM | AVAILABLE | 50 | 79140 | [tickets](https://my.pacificsciencecenter.org/79140) | main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 237; Add To Cart button disabled pending a selection |
+| 2026-08-25 | 7:30 PM | AVAILABLE | 50 | 80866 | [tickets](https://my.pacificsciencecenter.org/79140/80866) | main document HTTP 200; 'Purchase items' heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 214; Add To Cart button disabled pending a selection |
 
 > Availability can change immediately after this check. Confirm on the ticket page before making plans.
