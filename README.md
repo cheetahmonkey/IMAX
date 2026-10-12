@@ -1,9 +1,15 @@
-# The Odyssey IMAX ticket checker
+# PacSci IMAX ticket checker
 
-This project uses one Playwright/Chromium browser session to discover every listed
-Pacific Science Center performance of *The Odyssey* and classify its current ticket
-status. It reads the live date/time selector on the event page; performance IDs are
-not hard-coded.
+This checker discovers every listed performance for **Dune: Part 3** and one
+configurable **Current Feature** on Pacific Science Center's ticket site. It visits
+each performance in one Playwright/Chromium session and classifies it as `AVAILABLE`,
+`SOLD_OUT`, or `UNKNOWN`. It never selects tickets or submits a form.
+
+The Dune event ID is `80814`. The Current Feature is configured in
+[`current_feature.json`](current_feature.json), currently `81348` for Digger. When the
+feature changes, replace only `event_id` with the new PacSci event ID. The displayed
+film title comes from the live ticket page. The checker discovers performance IDs and
+showtimes from that event's selector; they are never entered into the config file.
 
 ## Install
 
@@ -16,70 +22,69 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-On Linux, Playwright may report missing operating-system libraries. If so, follow
-its displayed instructions or run `playwright install-deps chromium` with the
-appropriate system privileges.
+On Linux, follow Playwright's displayed instructions if Chromium needs system
+libraries.
 
 ## Run
 
 ```bash
-python check_odyssey.py
-python check_odyssey.py --headed --verbose
-python check_odyssey.py --limit 3 --headed
-python check_odyssey.py --performance-id 79156 --headed
-python check_odyssey.py --delay-seconds 2
+.venv/bin/python check_imax.py
+.venv/bin/python check_imax.py --film current_feature
+.venv/bin/python check_imax.py --film dune_three --limit 3 --headed
+.venv/bin/python check_imax.py --film current_feature --performance-id 81359 --verbose
+.venv/bin/python check_imax.py --delay-seconds 2
 ```
 
-`--headed` shows Chromium for debugging. `--limit` checks only the first N
-chronological performances. `--performance-id` filters the performances discovered
-from the live event page to one ID. `--delay-seconds` controls the respectful pause
-between checks (default: one second), and `--verbose` prints detailed evidence.
+The default run checks both films and updates the landing page. `--film` selects one
+film. `--limit` checks the first N chronological performances; `--performance-id`
+requires a selected film. `--delay-seconds` controls the pause between checks
+(default: one second). `--headed` shows Chromium, and `--verbose` prints evidence.
+Limited and single-performance runs replace that film's output files, but do not
+replace the landing page. Run the default command again to restore complete files.
 
-The checker never selects a ticket, adds anything to a cart, logs in, or submits a
-form. Performances are processed sequentially in a single browser session.
+For a scheduled refresh, use `scripts/refresh_imax.sh`. Its `--publish` option commits
+and pushes generated files after a successful run. The local legacy
+`scripts/refresh_odyssey.sh` can call that command if it is still scheduled.
 
 ## Status rules
 
-- `AVAILABLE`: the page has the purchase form and heading, plus an enabled positive
-  quantity option or a positive zone-availability count.
-- `SOLD_OUT`: the page explicitly says `Sold Out!` and has no conflicting strong
+- `AVAILABLE`: the purchase form and heading appear with an enabled positive
+  quantity or positive zone availability count.
+- `SOLD_OUT`: the visible page explicitly says `Sold Out!` without conflicting strong
   availability signals.
-- `UNKNOWN`: the page is incomplete, ambiguous, internally contradictory, or cannot
-  be interpreted safely. `UNKNOWN` is never silently treated as sold out.
+- `UNKNOWN`: the page is incomplete, ambiguous, contradictory, or could not be
+  interpreted safely. A page saying tickets are no longer available *or cancelled*
+  stays `UNKNOWN`.
 
-The Add To Cart button is normally disabled until a quantity is selected, including
-on available performances, so its initial disabled state is only supporting evidence.
+The Add To Cart button is usually disabled until a quantity is selected, including
+on available performances. Its initial disabled state is supporting evidence only.
 
 ## Output
 
-- `output/odyssey_availability.csv`: every checked performance and its evidence.
-- `output/odyssey_available.md`: only performances classified `AVAILABLE`.
-- `output/odyssey_all.md`: every checked performance in a Markdown table.
-- `output/unknown/`: timestamped HTML and screenshots for `UNKNOWN` results.
-- `docs/index.html`: a mobile-friendly, shareable table for GitHub Pages. Each
-  showtime links directly to its official ticket page.
+For each film slug (`dune_three` and `current_feature`):
 
-Rows are deduplicated by performance ID and sorted chronologically. The process exits
-nonzero if discovery finds nothing, all checked results are `UNKNOWN`, or a fatal
-browser/site error prevents a complete run.
+- `output/<slug>_availability.csv`: all checked performances and evidence.
+- `output/<slug>_available.md`: available performances only.
+- `output/<slug>_all.md`: all performances and statuses.
+- `docs/<slug>.html`: shareable page with official ticket links.
 
-## Troubleshooting
+`docs/index.html` links to both film pages after a complete two-film run.
+`output/unknown/` holds timestamped HTML and screenshots for `UNKNOWN` results.
+The old Odyssey checker and its generated files are retained for reference.
 
-- If Chromium is missing, run `playwright install chromium` in the active virtualenv.
-- If a headed run says no display is available, use a desktop terminal, `xvfb-run`,
-  or omit `--headed` for headless mode.
-- If the site times out, rerun with `--verbose`; navigation is retried three times and
-  unknown-page diagnostics are preserved.
-- Cookie banners do not affect the read-only DOM checks and do not need to be accepted.
-- Use `python -m unittest discover -s tests -v` to run the parsing/classification tests.
+Rows are deduplicated by performance ID and sorted chronologically. A run exits
+nonzero if discovery finds nothing, all results for either film are `UNKNOWN`, or a
+browser/site failure prevents completion. Generated pages update only after a
+successful run.
 
-Ticket availability can change immediately after a check. Always confirm the live
-ticket page before making plans.
+Run `python -m unittest discover -s tests -v` for parsing and classification tests.
+If Chromium is missing, run `playwright install chromium` in the active virtualenv.
+For a headed run without a display, use a desktop terminal or omit `--headed`.
+
+Ticket availability can change immediately after a check. Confirm the live ticket
+page before making plans.
 
 ## GitHub Pages
 
-The public page is generated at `docs/index.html` on every successful run. Configure
-GitHub Pages to deploy from the repository's default branch and the `/docs` folder.
-For this repository, the expected URL is:
-
-https://cheetahmonkey.github.io/IMAX/
+Serve the repository's default branch from `/docs`. The expected URL is
+https://cheetahmonkey.github.io/IMAX/.
