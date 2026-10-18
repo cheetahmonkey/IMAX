@@ -10,16 +10,17 @@ import sys
 import time
 from collections import Counter
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 from playwright.sync_api import Browser, Error as PlaywrightError, Page, TimeoutError as PlaywrightTimeout
 from playwright.sync_api import sync_playwright
 
 
 BASE_URL = "https://my.pacificsciencecenter.org"
+PACSCI_IMAX_URL = "https://pacificsciencecenter.org/visit/imax/"
 CURRENT_FEATURE_CONFIG = Path(__file__).with_name("current_feature.json")
 OUTPUT_DIR = Path("output")
 UNKNOWN_DIR = OUTPUT_DIR / "unknown"
@@ -77,6 +78,28 @@ class Film:
     @property
     def url(self) -> str:
         return "{}/{}".format(BASE_URL, self.event_id)
+
+
+class MissingShowtimesError(RuntimeError):
+    """The event page loaded, but its showtime selector did not appear."""
+
+
+def last_known_show_date(slug: str) -> Optional[date]:
+    path = OUTPUT_DIR / "{}_availability.csv".format(slug)
+    if not path.exists():
+        return None
+    with path.open(newline="", encoding="utf-8") as output_file:
+        dates = [
+            date.fromisoformat(row["date"])
+            for row in csv.DictReader(output_file)
+            if row.get("date")
+        ]
+    return max(dates) if dates else None
+
+
+def feature_rollover_due(today: date) -> bool:
+    final_show = last_known_show_date("current_feature")
+    return final_show is not None and final_show < today
 
 
 def configured_films() -> List[Film]:
@@ -181,13 +204,18 @@ def classify_signals(signals: PageSignals) -> Tuple[str, Optional[int], List[str
 
 def navigate_with_retries(page: Page, url: str, verbose: bool, attempts: int = 3):
     last_error = None
+    selector_missing = False
     for attempt in range(1, attempts + 1):
         try:
             response = page.goto(url, wait_until="domcontentloaded", timeout=45_000)
             page.locator("body").wait_for(state="attached", timeout=10_000)
-            page.locator(".tn-additional-events__date-select").first.wait_for(
-                state="attached", timeout=15_000
-            )
+            try:
+                page.locator(".tn-additional-events__date-select").first.wait_for(
+                    state="attached", timeout=15_000
+                )
+            except PlaywrightTimeout:
+                selector_missing = True
+                raise
             page.wait_for_timeout(750)
             return response
         except (PlaywrightTimeout, PlaywrightError) as exc:
@@ -196,7 +224,34 @@ def navigate_with_retries(page: Page, url: str, verbose: bool, attempts: int = 3
                 print("  navigation attempt {}/{} failed: {}".format(attempt, attempts, exc))
             if attempt < attempts:
                 page.wait_for_timeout(1_500 * attempt)
+    if selector_missing:
+        raise MissingShowtimesError("showtime selector absent at {} after {} attempts".format(url, attempts))
     raise RuntimeError("navigation failed after {} attempts: {}".format(attempts, last_error))
+
+
+def discover_current_feature(page: Page) -> Film:
+    """Resolve PacSci's current feature poster to its live ticket event."""
+    response = page.goto(PACSCI_IMAX_URL, wait_until="domcontentloaded", timeout=45_000)
+    if response is None or response.status >= 400:
+        raise RuntimeError("PacSci IMAX listing could not be loaded")
+    poster = page.locator(".movie-posters--short .movie-poster__link").first
+    poster.wait_for(state="attached", timeout=15_000)
+    feature_url = urljoin(PACSCI_IMAX_URL, poster.get_attribute("href") or "")
+    if urlparse(feature_url).netloc != urlparse(PACSCI_IMAX_URL).netloc:
+        raise RuntimeError("current feature poster links outside PacSci")
+
+    response = page.goto(feature_url, wait_until="domcontentloaded", timeout=45_000)
+    if response is None or response.status >= 400:
+        raise RuntimeError("PacSci current feature page could not be loaded")
+    links = page.locator("a[href*='my.pacificsciencecenter.org/']").evaluate_all(
+        "links => links.map(link => link.href)"
+    )
+    for link in links:
+        parsed = urlparse(link)
+        parts = [part for part in parsed.path.split("/") if part]
+        if parsed.netloc == urlparse(BASE_URL).netloc and parts and parts[0].isdigit():
+            return Film("current_feature", parts[0], page.locator("h1").first.inner_text().strip())
+    raise RuntimeError("PacSci current feature has no numeric ticket event link")
 
 
 def discover_performances(page: Page, film: Film, verbose: bool) -> List[PerformanceSeed]:
@@ -642,6 +697,7 @@ def run(args) -> int:
     results_by_slug = {}  # type: Dict[str, List[Result]]
     resolved_films = {}  # type: Dict[str, Film]
     incomplete = False
+    replacement_feature_id = None  # type: Optional[str]
     try:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=not args.headed)
@@ -650,7 +706,22 @@ def run(args) -> int:
                 page = context.new_page()
                 page.route("**/*", block_heavy_resources)
                 for film in films:
-                    performances = discover_performances(page, film, args.verbose)
+                    try:
+                        performances = discover_performances(page, film, args.verbose)
+                    except MissingShowtimesError:
+                        if film.slug != "current_feature" or not feature_rollover_due(date.today()):
+                            raise
+                        performances = []
+                    if film.slug == "current_feature" and not performances and feature_rollover_due(date.today()):
+                        replacement = discover_current_feature(page)
+                        if replacement.event_id == film.event_id:
+                            raise RuntimeError("Current Feature has ended, but PacSci still lists the same event")
+                        print("Current Feature ended; switching event {} to {} ({})".format(
+                            film.event_id, replacement.event_id, replacement.label
+                        ))
+                        film = replacement
+                        replacement_feature_id = film.event_id
+                        performances = discover_performances(page, film, args.verbose)
                     if args.performance_id:
                         performances = [
                             item for item in performances if item.performance_id == args.performance_id
@@ -695,6 +766,11 @@ def run(args) -> int:
         if counts["UNKNOWN"] == len(results):
             print("Every {} performance was UNKNOWN.".format(film.label), file=sys.stderr)
             return 3
+    if replacement_feature_id:
+        CURRENT_FEATURE_CONFIG.write_text(
+            json.dumps({"event_id": replacement_feature_id}, indent=2) + "\n",
+            encoding="utf-8",
+        )
     for film in films:
         film = resolved_films[film.slug]
         results = results_by_slug[film.slug]

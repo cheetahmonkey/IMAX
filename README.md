@@ -6,10 +6,13 @@ each performance in one Playwright/Chromium session and classifies it as `AVAILA
 `SOLD_OUT`, or `UNKNOWN`. It never selects tickets or submits a form.
 
 The Dune event ID is `80814`. The Current Feature is configured in
-[`current_feature.json`](current_feature.json), currently `81344` for Street Fighter. When the
-feature changes, replace only `event_id` with the new PacSci event ID. The displayed
-film title comes from the live ticket page. The checker discovers performance IDs and
-showtimes from that event's selector; they are never entered into the config file.
+[`current_feature.json`](current_feature.json). When the feature changes, the
+scheduled checker can replace `event_id` automatically: it does
+so only after the last stored show date has passed, the old event has no showtime
+selector, and PacSci's current feature listing points to a different ticket event.
+You can also replace `event_id` manually. The displayed film title comes from the
+live ticket page. The checker discovers performance IDs and showtimes from that
+event's selector; they are never entered into the config file.
 
 ## Install
 

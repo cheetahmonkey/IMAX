@@ -1,6 +1,16 @@
 import unittest
+import json
+from datetime import date
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import MagicMock, patch
 
-from check_imax import Film, Result, configured_films, render_index, render_shareable_html
+from playwright.sync_api import TimeoutError as PlaywrightTimeout
+
+from check_imax import (
+    Film, MissingShowtimesError, Result, configured_films, feature_rollover_due,
+    navigate_with_retries, render_index, render_shareable_html,
+)
 
 
 def result(name, performance_id, url):
@@ -20,7 +30,25 @@ def result(name, performance_id, url):
 class FilmConfigurationTests(unittest.TestCase):
     def test_current_feature_event_id_is_configured(self):
         films = configured_films()
-        self.assertEqual([film.event_id for film in films], ["80814", "81348"])
+        configured_id = json.loads(Path("current_feature.json").read_text())["event_id"]
+        self.assertEqual([film.event_id for film in films], ["80814", configured_id])
+
+    def test_feature_rollover_waits_until_after_final_show(self):
+        with TemporaryDirectory() as directory:
+            Path(directory, "current_feature_availability.csv").write_text(
+                "date,status\n2026-10-18,AVAILABLE\n2026-10-22,AVAILABLE\n",
+                encoding="utf-8",
+            )
+            with patch("check_imax.OUTPUT_DIR", Path(directory)):
+                self.assertFalse(feature_rollover_due(date(2026, 10, 22)))
+                self.assertTrue(feature_rollover_due(date(2026, 10, 23)))
+
+    def test_missing_selector_is_distinct_from_other_navigation_errors(self):
+        page = MagicMock()
+        page.locator.return_value.first.wait_for.side_effect = PlaywrightTimeout("no selector")
+        with self.assertRaises(MissingShowtimesError):
+            navigate_with_retries(page, "https://my.pacificsciencecenter.org/81344", False)
+        self.assertEqual(page.goto.call_count, 3)
 
     def test_film_pages_use_the_film_name_and_event_url(self):
         film = Film("current_feature", "81348", "Digger")
