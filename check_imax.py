@@ -229,29 +229,48 @@ def navigate_with_retries(page: Page, url: str, verbose: bool, attempts: int = 3
     raise RuntimeError("navigation failed after {} attempts: {}".format(attempts, last_error))
 
 
-def discover_current_feature(page: Page) -> Film:
-    """Resolve PacSci's current feature poster to its live ticket event."""
+def discover_current_feature(page: Page, excluded_event_ids: Sequence[str] = ()) -> Film:
+    """Find the first listed feature that still has upcoming ticket performances.
+
+    PacSci can leave retired posters ahead of their replacements. Never assume
+    the first poster is current, or select a separately tracked event as its replacement.
+    """
     response = page.goto(PACSCI_IMAX_URL, wait_until="domcontentloaded", timeout=45_000)
     if response is None or response.status >= 400:
         raise RuntimeError("PacSci IMAX listing could not be loaded")
-    poster = page.locator(".movie-posters--short .movie-poster__link").first
-    poster.wait_for(state="attached", timeout=15_000)
-    feature_url = urljoin(PACSCI_IMAX_URL, poster.get_attribute("href") or "")
-    if urlparse(feature_url).netloc != urlparse(PACSCI_IMAX_URL).netloc:
-        raise RuntimeError("current feature poster links outside PacSci")
-
-    response = page.goto(feature_url, wait_until="domcontentloaded", timeout=45_000)
-    if response is None or response.status >= 400:
-        raise RuntimeError("PacSci current feature page could not be loaded")
-    links = page.locator("a[href*='my.pacificsciencecenter.org/']").evaluate_all(
-        "links => links.map(link => link.href)"
+    posters = page.locator(".movie-posters--short .movie-poster__link")
+    posters.first.wait_for(state="attached", timeout=15_000)
+    feature_urls = posters.evaluate_all("links => links.map(link => link.href)")
+    for feature_url in dict.fromkeys(feature_urls):
+        feature_url = urljoin(PACSCI_IMAX_URL, feature_url)
+        if urlparse(feature_url).netloc != urlparse(PACSCI_IMAX_URL).netloc:
+            raise RuntimeError("current feature poster links outside PacSci")
+        response = page.goto(feature_url, wait_until="domcontentloaded", timeout=45_000)
+        if response is None or response.status >= 400:
+            raise RuntimeError("PacSci current feature page could not be loaded")
+        links = page.locator("a[href*='my.pacificsciencecenter.org/']").evaluate_all(
+            "links => links.map(link => link.href)"
+        )
+        event_ids = set()
+        for link in links:
+            parsed = urlparse(link)
+            parts = [part for part in parsed.path.split("/") if part]
+            if parsed.netloc == urlparse(BASE_URL).netloc and parts and parts[0].isdigit():
+                event_ids.add(parts[0])
+        if not event_ids:
+            continue  # Retired posters can remain after ticket links are removed.
+        if len(event_ids) != 1:
+            raise RuntimeError("Ambiguous ticket events on current feature page: {}".format(feature_url))
+        event_id = event_ids.pop()
+        if event_id in excluded_event_ids:
+            continue
+        candidate = Film("current_feature", event_id, page.locator("h1").first.inner_text().strip())
+        performances = discover_performances(page, candidate, False)
+        if any(date.fromisoformat(item.date) >= date.today() for item in performances):
+            return Film(candidate.slug, candidate.event_id, performances[0].event_name)
+    raise RuntimeError(
+        "PacSci lists no replacement feature with unambiguous upcoming ticket performances"
     )
-    for link in links:
-        parsed = urlparse(link)
-        parts = [part for part in parsed.path.split("/") if part]
-        if parsed.netloc == urlparse(BASE_URL).netloc and parts and parts[0].isdigit():
-            return Film("current_feature", parts[0], page.locator("h1").first.inner_text().strip())
-    raise RuntimeError("PacSci current feature has no numeric ticket event link")
 
 
 def discover_performances(page: Page, film: Film, verbose: bool) -> List[PerformanceSeed]:
@@ -712,8 +731,15 @@ def run(args) -> int:
                         if film.slug != "current_feature" or not feature_rollover_due(date.today()):
                             raise
                         performances = []
-                    if film.slug == "current_feature" and not performances and feature_rollover_due(date.today()):
-                        replacement = discover_current_feature(page)
+                    ended = performances and all(
+                        date.fromisoformat(item.date) < date.today() for item in performances
+                    )
+                    if film.slug == "current_feature" and (
+                        ended or (not performances and feature_rollover_due(date.today()))
+                    ):
+                        replacement = discover_current_feature(
+                            page, [item.event_id for item in configured_films()]
+                        )
                         if replacement.event_id == film.event_id:
                             raise RuntimeError("Current Feature has ended, but PacSci still lists the same event")
                         print("Current Feature ended; switching event {} to {} ({})".format(

@@ -8,8 +8,14 @@ each performance in one Playwright/Chromium session and classifies it as `AVAILA
 The Dune event ID is `80814`. The Current Feature is configured in
 [`current_feature.json`](current_feature.json). When the feature changes, the
 scheduled checker can replace `event_id` automatically: it does
-so only after the last stored show date has passed, the old event has no showtime
-selector, and PacSci's current feature listing points to a different ticket event.
+so only after the previous run has ended (its live showtimes are all in the past,
+or its selector is absent after the last stored show date). It walks PacSci's
+feature posters in listing order, skips retired pages without ticket links and
+separately tracked films, and validates a replacement's upcoming live showtimes.
+Multiple ticket-event IDs on one feature page are ambiguous and stop the refresh.
+The new event ID is saved only after a successful availability scan. Its live title
+and results replace the retired feature in `current_feature` outputs and pages;
+previous versions remain in Git history when published.
 You can also replace `event_id` manually. The displayed film title comes from the
 live ticket page. The checker discovers performance IDs and showtimes from that
 event's selector; they are never entered into the config file.
