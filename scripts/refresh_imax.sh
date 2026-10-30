@@ -16,6 +16,7 @@ if [[ "${1:-}" == "--publish" ]]; then
   git add -- "${artifacts[@]}"
   if ! git diff --cached --quiet -- "${artifacts[@]}"; then
     git commit --only -m "Refresh IMAX availability $(date '+%Y-%m-%d %H:%M %Z')" -- "${artifacts[@]}"
-    git push origin main
   fi
+  # A previous attempt may have committed successfully but failed to push.
+  git push origin main
 fi

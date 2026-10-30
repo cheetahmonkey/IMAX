@@ -91,3 +91,33 @@ page before making plans.
 
 Serve the repository's default branch from `/docs`. The expected URL is
 https://cheetahmonkey.github.io/IMAX/.
+
+## Windows daily scheduling (WSL)
+
+Run `scripts/install_windows_task.ps1` in Windows PowerShell to register
+`IMAX Daily Refresh`. Its defaults target the `Ubuntu` WSL distribution, Linux
+user `mmm`, and `/home/mmm/code/IMAX`; use the script parameters on another laptop.
+The task publishes daily at **03:15 Windows local time**, wakes the laptop when
+supported, runs on battery, and catches up missed runs at the owner's next sign-in.
+It requires that Windows user to be signed in; it does not run before sign-in.
+Failures retry three times, 15 minutes apart. Concurrent runs are prevented.
+
+The action runs `scripts/run_imax_scheduled.sh --if-due`. A successful run records
+`logs/last_success`, so additional sign-ins do not repeat the same daily refresh.
+Logs are in `logs/imax_refresh.log`. The task automatically commits and pushes
+only the generated publication files and current feature configuration.
+Configure this repo's Git author identity and authenticate GitHub before enabling
+it; verify with an on-demand run in Task Scheduler and check Last Run Result `0`.
+
+For Healthchecks, create the ignored local file `.imax-scheduler.env`:
+
+```bash
+IMAX_HEALTHCHECK_URL=https://hc-ping.com/YOUR-CHECK-ID
+```
+
+Set its permissions to `600`. The wrapper sends `/start`, success after scan and
+push, or `/fail` if the refresh fails. A failed success ping causes a task retry.
+The ping URL is never committed. In the Healthchecks dashboard, configure the
+check's schedule as `15 3 * * *` in `America/Los_Angeles` with an appropriate grace
+period (for example, one hour). Laptop downtime beyond the grace period will alert.
+The ping URL alone cannot configure that dashboard schedule.
