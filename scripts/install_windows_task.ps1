@@ -8,6 +8,9 @@ $ErrorActionPreference = 'Stop'
 $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 $action = New-ScheduledTaskAction -Execute "$env:SystemRoot\System32\wsl.exe" -Argument "--distribution $Distro --user $LinuxUser --exec /bin/bash $ProjectPath/scripts/run_imax_scheduled.sh --if-due"
 $daily = New-ScheduledTaskTrigger -Daily -At '03:15'
+# Leave the boundary without a UTC offset so DST changes preserve 03:15 local
+# time rather than pinning the schedule to the UTC time at registration.
+$daily.StartBoundary = (Get-Date -Hour 3 -Minute 15 -Second 0).ToString('yyyy-MM-ddTHH:mm:ss')
 $logon = New-ScheduledTaskTrigger -AtLogOn -User $identity
 $logon.Delay = 'PT1M'
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfNetworkAvailable -MultipleInstances IgnoreNew -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 15) -ExecutionTimeLimit (New-TimeSpan -Hours 1)
