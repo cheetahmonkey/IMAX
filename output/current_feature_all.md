@@ -2,7 +2,6 @@
 
 | Date | Time | Status | Max quantity | Performance ID | URL | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2026-11-19 | 2:45 PM | AVAILABLE | 50 | 82549 | [tickets](https://my.pacificsciencecenter.org/79922/82549) | main document HTTP 200; purchase heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 278; Add To Cart button disabled pending a selection |
 | 2026-11-20 | 2:45 PM | AVAILABLE | 50 | 82550 | [tickets](https://my.pacificsciencecenter.org/79922/82550) | main document HTTP 200; purchase heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 280; Add To Cart button disabled pending a selection |
 | 2026-11-21 | 2:45 PM | AVAILABLE | 50 | 82551 | [tickets](https://my.pacificsciencecenter.org/79922/82551) | main document HTTP 200; purchase heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 277; Add To Cart button disabled pending a selection |
 | 2026-11-22 | 2:45 PM | AVAILABLE | 50 | 82552 | [tickets](https://my.pacificsciencecenter.org/79922/82552) | main document HTTP 200; purchase heading; ticket-selector form present; enabled quantity options through 50; positive zone availability count(s): 278; Add To Cart button disabled pending a selection |
